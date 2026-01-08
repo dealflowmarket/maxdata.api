@@ -1,0 +1,28 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: maxdata-api
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    # If you want to use a local mongodb instead of the remote one, uncomment the lines below
+    # depends_on:
+    #   - mongodb
+
+  # mongodb:
+  #   image: mongo:latest
+  #   container_name: maxdata-mongo
+  #   ports:
+  #     - "27017:27017"
+  #   volumes:
+  #     - mongo_data:/data/db
+  #   restart: unless-stopped
+
+# volumes:
+#   mongo_data:
