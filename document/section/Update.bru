@@ -1,0 +1,28 @@
+meta {
+  name: Update
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{URL}}/section/6960165b7b478dd160023056
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "title": "B"
+  }
+}
+
+body:multipart-form {
+  title: A @contentType(text)
+  description_th: เกษตรกรรม การป่าไม้ และการประมง @contentType(text)
+  description_en: Agriculture forestry and fishing @contentType(text)
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

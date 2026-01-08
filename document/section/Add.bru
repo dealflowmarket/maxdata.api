@@ -1,0 +1,30 @@
+meta {
+  name: Add
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{URL}}/section
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "title": "A",
+    "description_th": "เกษตรกรรม การป่าไม้ และการประมง",
+    "description_en": "Agriculture forestry and fishing"
+  }
+}
+
+body:multipart-form {
+  title: A @contentType(text)
+  description_th: เกษตรกรรม การป่าไม้ และการประมง @contentType(text)
+  description_en: Agriculture forestry and fishing @contentType(text)
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

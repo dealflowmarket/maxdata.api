@@ -1,0 +1,31 @@
+meta {
+  name: Add
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{URL}}/tsic
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "title": "01111",
+    "description_th": "การปลูกข้าวโพดที่ใช้เมล็ดแก่",
+    "description_en": "Growing of grain maize",
+    "section": "69601ed666bef89799ab31c7"
+  }
+}
+
+body:multipart-form {
+  title: A @contentType(text)
+  description_th: เกษตรกรรม การป่าไม้ และการประมง @contentType(text)
+  description_en: Agriculture forestry and fishing @contentType(text)
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

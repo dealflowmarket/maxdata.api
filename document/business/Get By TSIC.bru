@@ -1,0 +1,20 @@
+meta {
+  name: Get By TSIC
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{URL}}/business?tsic=6960224814b9e67c46ada2e2
+  body: none
+  auth: inherit
+}
+
+params:query {
+  tsic: 6960224814b9e67c46ada2e2
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

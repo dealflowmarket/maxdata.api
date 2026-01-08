@@ -1,0 +1,22 @@
+meta {
+  name: Delete
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{URL}}/section/696017a6a40a2032d512e84f
+  body: none
+  auth: inherit
+}
+
+body:multipart-form {
+  title: A @contentType(text)
+  description_th: เกษตรกรรม การป่าไม้ และการประมง @contentType(text)
+  description_en: Agriculture forestry and fishing @contentType(text)
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

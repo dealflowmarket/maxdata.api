@@ -1,0 +1,28 @@
+meta {
+  name: Update
+  type: http
+  seq: 5
+}
+
+patch {
+  url: {{URL}}/business/69602b48aa0d1f29ed24ea35
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "type": "Private Limited Company"
+  }
+}
+
+body:multipart-form {
+  title: A @contentType(text)
+  description_th: เกษตรกรรม การป่าไม้ และการประมง @contentType(text)
+  description_en: Agriculture forestry and fishing @contentType(text)
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
