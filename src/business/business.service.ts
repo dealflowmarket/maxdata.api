@@ -39,6 +39,43 @@ export class BusinessService {
         }
     }
 
+    async list(tsicId?: string): Promise<any[]> {
+        const filter: any = {};
+        if (tsicId) {
+            filter.tsic = tsicId;
+        }
+
+        const businesses = await this.businessModel.find(filter, {
+            businessid: 1,
+            name: 1,
+            type: 1,
+            tsic: 1,
+            reg_cap: 1,
+            total_revenue: 1,
+            net_profit: 1,
+        }).populate('tsic').exec();
+
+        return businesses.map(business => {
+            const revenue_last = business.total_revenue && business.total_revenue.length > 0
+                ? business.total_revenue[business.total_revenue.length - 1]
+                : 0;
+
+            const profit_last = business.net_profit && business.net_profit.length > 0
+                ? business.net_profit[business.net_profit.length - 1]
+                : 0;
+
+            return {
+                businessid: business.businessid,
+                name: business.name,
+                type: business.type,
+                tsic: business.tsic,
+                reg_cap: business.reg_cap,
+                revenue_last,
+                profit_last,
+            };
+        });
+    }
+
     async findByTsic(tsicId: string): Promise<Business[]> {
         if (!isValidObjectId(tsicId)) {
             throw new BadRequestException('Invalid TSIC ID format');

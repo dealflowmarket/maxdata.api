@@ -23,6 +23,11 @@ export class BusinessController {
         return this.businessService.create(createBusinessDto);
     }
 
+    @Get('list')
+    list(@Query('tsic') tsic?: string) {
+        return this.businessService.list(tsic);
+    }
+
     @Get()
     findAll(@Query('tsic') tsic?: string) {
         if (tsic) {
