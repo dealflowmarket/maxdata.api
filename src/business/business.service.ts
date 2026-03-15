@@ -95,13 +95,14 @@ export class BusinessService {
     }
 
     async findOne(id: string): Promise<Business> {
-        if (!isValidObjectId(id)) {
+        const businessId = parseInt(id, 10);
+        if (isNaN(businessId)) {
             throw new BadRequestException('Invalid business ID format');
         }
 
         try {
             const business = await this.businessModel
-                .findById(id)
+                .findOne({ businessid: businessId })
                 .populate('tsic')
                 .populate('section')
                 .exec();
