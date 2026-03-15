@@ -96,13 +96,10 @@ export class BusinessService {
 
     async findOne(id: string): Promise<Business> {
         const businessId = parseInt(id, 10);
-        if (isNaN(businessId)) {
-            throw new BadRequestException('Invalid business ID format');
-        }
 
         try {
             const business = await this.businessModel
-                .findOne({ businessid: businessId })
+                .findOne({ businessid: isNaN(businessId) ? id : businessId })
                 .populate('tsic')
                 .populate('section')
                 .exec();
