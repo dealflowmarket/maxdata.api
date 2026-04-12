@@ -20,8 +20,9 @@ export class PostgresService implements OnModuleDestroy {
     }
 
     const sslMode = (this.configService.get<string>('PGSSLMODE') || 'require').toLowerCase();
+    const normalizedConnectionString = this.normalizeConnectionString(connectionString);
     this.pool = new Pool({
-      connectionString,
+      connectionString: normalizedConnectionString,
       ssl: sslMode === 'disable' ? false : { rejectUnauthorized: false },
       max: Number(this.configService.get<string>('PG_POOL_MAX') || 10),
     });
@@ -49,6 +50,16 @@ export class PostgresService implements OnModuleDestroy {
   async onModuleDestroy(): Promise<void> {
     if (this.pool) {
       await this.pool.end();
+    }
+  }
+
+  private normalizeConnectionString(connectionString: string): string {
+    try {
+      const url = new URL(connectionString);
+      url.searchParams.delete('sslmode');
+      return url.toString();
+    } catch {
+      return connectionString;
     }
   }
 }
