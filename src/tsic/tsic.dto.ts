@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsMongoId } from 'class-validator';
+import { IsString, IsNotEmpty } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
 
 export class CreateTsicDto {
@@ -14,7 +14,7 @@ export class CreateTsicDto {
     @IsNotEmpty()
     description_en: string;
 
-    @IsMongoId()
+    @IsString()
     @IsNotEmpty()
     section: string;
 }

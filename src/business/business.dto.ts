@@ -1,7 +1,6 @@
 import {
     IsString,
     IsNotEmpty,
-    IsMongoId,
     IsOptional,
     IsDate,
     IsNumber,
@@ -41,7 +40,7 @@ export class CreateBusinessDto {
     regno_old?: string;
 
     @IsOptional()
-    @IsMongoId()
+    @IsString()
     section?: string;
 
     @IsOptional()
@@ -66,7 +65,7 @@ export class CreateBusinessDto {
     @IsString({ each: true })
     directors?: string[];
 
-    @IsMongoId()
+    @IsString()
     @IsNotEmpty()
     tsic: string;
 
