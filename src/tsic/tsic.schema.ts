@@ -6,7 +6,7 @@ export type TsicDocument = Tsic & Document;
 
 @Schema({ timestamps: true })
 export class Tsic {
-    @Prop({ required: true })
+    @Prop({ required: true, trim: true, unique: true, index: true })
     title: string;
 
     @Prop({ required: true })

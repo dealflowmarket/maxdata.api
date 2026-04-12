@@ -25,9 +25,22 @@ export class TsicService {
         }
     }
 
-    async findAll(): Promise<Tsic[]> {
+    async findAll(filters?: { section?: string; title?: string }): Promise<Tsic[]> {
+        const query: Record<string, unknown> = {};
+
+        if (filters?.section) {
+            if (!isValidObjectId(filters.section)) {
+                throw new BadRequestException('Invalid section ID format');
+            }
+            query.section = filters.section;
+        }
+
+        if (filters?.title) {
+            query.title = filters.title;
+        }
+
         try {
-            return await this.tsicModel.find().populate('section').exec();
+            return await this.tsicModel.find(query).populate('section').exec();
         } catch (error) {
             throw new BadRequestException(
                 `Failed to retrieve TSICs: ${error.message}`,
@@ -36,20 +49,14 @@ export class TsicService {
     }
 
     async findBySection(sectionId: string): Promise<Tsic[]> {
-        if (!isValidObjectId(sectionId)) {
-            throw new BadRequestException('Invalid section ID format');
-        }
+        return this.findAll({ section: sectionId });
+    }
 
-        try {
-            return await this.tsicModel
-                .find({ section: sectionId })
-                .populate('section')
-                .exec();
-        } catch (error) {
-            throw new BadRequestException(
-                `Failed to retrieve TSICs by section: ${error.message}`,
-            );
+    async findByTitle(title: string): Promise<Tsic[]> {
+        if (!title) {
+            return [];
         }
+        return this.findAll({ title: title.trim() });
     }
 
     async findOne(id: string): Promise<Tsic> {

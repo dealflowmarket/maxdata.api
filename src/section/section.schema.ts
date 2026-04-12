@@ -5,7 +5,7 @@ export type SectionDocument = Section & Document;
 
 @Schema({ timestamps: true })
 export class Section {
-    @Prop({ required: true })
+    @Prop({ required: true, trim: true, unique: true, index: true })
     title: string;
 
     @Prop({ required: true })

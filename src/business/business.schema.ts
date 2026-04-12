@@ -15,7 +15,7 @@ export class Business {
     @Prop({ required: true })
     status: string;
 
-    @Prop({ required: true })
+    @Prop({ required: true, unique: true, index: true })
     businessid: number;
 
     @Prop()

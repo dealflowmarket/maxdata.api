@@ -24,7 +24,13 @@ export class TsicController {
     }
 
     @Get()
-    findAll(@Query('section') section?: string) {
+    findAll(
+        @Query('section') section?: string,
+        @Query('title') title?: string,
+    ) {
+        if (title) {
+            return this.tsicService.findByTitle(title);
+        }
         if (section) {
             return this.tsicService.findBySection(section);
         }
