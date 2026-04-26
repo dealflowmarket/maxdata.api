@@ -1,7 +1,7 @@
 import {
-    Injectable,
-    NotFoundException,
-    BadRequestException,
+  Injectable,
+  NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, isValidObjectId } from 'mongoose';
@@ -10,118 +10,110 @@ import { CreateTsicDto, UpdateTsicDto } from './tsic.dto';
 
 @Injectable()
 export class TsicService {
-    constructor(
-        @InjectModel(Tsic.name) private tsicModel: Model<TsicDocument>,
-    ) { }
+  constructor(@InjectModel(Tsic.name) private tsicModel: Model<TsicDocument>) {}
 
-    async create(createTsicDto: CreateTsicDto): Promise<Tsic> {
-        try {
-            const createdTsic = new this.tsicModel(createTsicDto);
-            return await createdTsic.save();
-        } catch (error) {
-            throw new BadRequestException(
-                `Failed to create TSIC: ${error.message}`,
-            );
-        }
+  async create(createTsicDto: CreateTsicDto): Promise<Tsic> {
+    try {
+      const createdTsic = new this.tsicModel(createTsicDto);
+      return await createdTsic.save();
+    } catch (error) {
+      throw new BadRequestException(`Failed to create TSIC: ${error.message}`);
+    }
+  }
+
+  async findAll(): Promise<Tsic[]> {
+    try {
+      return await this.tsicModel.find().populate('section').exec();
+    } catch (error) {
+      throw new BadRequestException(
+        `Failed to retrieve TSICs: ${error.message}`,
+      );
+    }
+  }
+
+  async findBySection(sectionId: string): Promise<Tsic[]> {
+    if (!isValidObjectId(sectionId)) {
+      throw new BadRequestException('Invalid section ID format');
     }
 
-    async findAll(): Promise<Tsic[]> {
-        try {
-            return await this.tsicModel.find().populate('section').exec();
-        } catch (error) {
-            throw new BadRequestException(
-                `Failed to retrieve TSICs: ${error.message}`,
-            );
-        }
+    try {
+      return await this.tsicModel
+        .find({ section: sectionId })
+        .populate('section')
+        .exec();
+    } catch (error) {
+      throw new BadRequestException(
+        `Failed to retrieve TSICs by section: ${error.message}`,
+      );
+    }
+  }
+
+  async findOne(id: string): Promise<Tsic> {
+    if (!isValidObjectId(id)) {
+      throw new BadRequestException('Invalid TSIC ID format');
     }
 
-    async findBySection(sectionId: string): Promise<Tsic[]> {
-        if (!isValidObjectId(sectionId)) {
-            throw new BadRequestException('Invalid section ID format');
-        }
+    try {
+      const tsic = await this.tsicModel.findById(id).populate('section').exec();
+      if (!tsic) {
+        throw new NotFoundException(`TSIC with ID "${id}" not found`);
+      }
+      return tsic;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new BadRequestException(
+        `Failed to retrieve TSIC: ${error.message}`,
+      );
+    }
+  }
 
-        try {
-            return await this.tsicModel
-                .find({ section: sectionId })
-                .populate('section')
-                .exec();
-        } catch (error) {
-            throw new BadRequestException(
-                `Failed to retrieve TSICs by section: ${error.message}`,
-            );
-        }
+  async update(id: string, updateTsicDto: UpdateTsicDto): Promise<Tsic> {
+    if (!isValidObjectId(id)) {
+      throw new BadRequestException('Invalid TSIC ID format');
     }
 
-    async findOne(id: string): Promise<Tsic> {
-        if (!isValidObjectId(id)) {
-            throw new BadRequestException('Invalid TSIC ID format');
-        }
+    try {
+      const updatedTsic = await this.tsicModel
+        .findByIdAndUpdate(id, updateTsicDto, { new: true })
+        .populate('section')
+        .exec();
 
-        try {
-            const tsic = await this.tsicModel.findById(id).populate('section').exec();
-            if (!tsic) {
-                throw new NotFoundException(`TSIC with ID "${id}" not found`);
-            }
-            return tsic;
-        } catch (error) {
-            if (error instanceof NotFoundException) {
-                throw error;
-            }
-            throw new BadRequestException(
-                `Failed to retrieve TSIC: ${error.message}`,
-            );
-        }
+      if (!updatedTsic) {
+        throw new NotFoundException(`TSIC with ID "${id}" not found`);
+      }
+
+      return updatedTsic;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new BadRequestException(`Failed to update TSIC: ${error.message}`);
+    }
+  }
+
+  async remove(id: string): Promise<Tsic> {
+    if (!isValidObjectId(id)) {
+      throw new BadRequestException('Invalid TSIC ID format');
     }
 
-    async update(id: string, updateTsicDto: UpdateTsicDto): Promise<Tsic> {
-        if (!isValidObjectId(id)) {
-            throw new BadRequestException('Invalid TSIC ID format');
-        }
+    try {
+      const deletedTsic = await this.tsicModel
+        .findByIdAndDelete(id)
+        .populate('section')
+        .exec();
 
-        try {
-            const updatedTsic = await this.tsicModel
-                .findByIdAndUpdate(id, updateTsicDto, { new: true })
-                .populate('section')
-                .exec();
+      if (!deletedTsic) {
+        throw new NotFoundException(`TSIC with ID "${id}" not found`);
+      }
 
-            if (!updatedTsic) {
-                throw new NotFoundException(`TSIC with ID "${id}" not found`);
-            }
-
-            return updatedTsic;
-        } catch (error) {
-            if (error instanceof NotFoundException) {
-                throw error;
-            }
-            throw new BadRequestException(
-                `Failed to update TSIC: ${error.message}`,
-            );
-        }
+      return deletedTsic;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new BadRequestException(`Failed to delete TSIC: ${error.message}`);
     }
-
-    async remove(id: string): Promise<Tsic> {
-        if (!isValidObjectId(id)) {
-            throw new BadRequestException('Invalid TSIC ID format');
-        }
-
-        try {
-            const deletedTsic = await this.tsicModel
-                .findByIdAndDelete(id)
-                .populate('section')
-                .exec();
-
-            if (!deletedTsic) {
-                throw new NotFoundException(`TSIC with ID "${id}" not found`);
-            }
-
-            return deletedTsic;
-        } catch (error) {
-            if (error instanceof NotFoundException) {
-                throw error;
-            }
-            throw new BadRequestException(
-                `Failed to delete TSIC: ${error.message}`,
-            );
-        }
-    }
+  }
 }

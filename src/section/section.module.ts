@@ -5,11 +5,11 @@ import { SectionService } from './section.service';
 import { Section, SectionSchema } from './section.schema';
 
 @Module({
-    imports: [
-        MongooseModule.forFeature([{ name: Section.name, schema: SectionSchema }]),
-    ],
-    controllers: [SectionController],
-    providers: [SectionService],
-    exports: [SectionService],
+  imports: [
+    MongooseModule.forFeature([{ name: Section.name, schema: SectionSchema }]),
+  ],
+  controllers: [SectionController],
+  providers: [SectionService],
+  exports: [SectionService],
 })
-export class SectionModule { }
+export class SectionModule {}
