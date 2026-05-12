@@ -20,50 +20,42 @@ export class BusinessService {
             return await createdBusiness.save();
         } catch (error) {
             throw new BadRequestException(
-                `Failed to create business: ${error.message}`,
+                `Failed to create business: ${(error as Error).message}`,
             );
         }
     }
 
-    async findAll(): Promise<Business[]> {
-        try {
-            return await this.businessModel
-                .find()
-                .populate('tsic')
-                .populate('section')
-                .exec();
-        } catch (error) {
-            throw new BadRequestException(
-                `Failed to retrieve businesses: ${error.message}`,
-            );
-        }
-    }
-
-    async list(tsicId?: string): Promise<any[]> {
+    async findAll(tsicId?: string, page = 1, limit = 10): Promise<{ data: any[]; total: number; page: number; limit: number }> {
         const filter: any = {};
         if (tsicId) {
+            if (!isValidObjectId(tsicId)) {
+                throw new BadRequestException('Invalid TSIC ID format');
+            }
             filter.tsic = tsicId;
         }
 
-        const businesses = await this.businessModel.find(filter, {
-            businessid: 1,
-            name: 1,
-            type: 1,
-            tsic: 1,
-            reg_cap: 1,
-            total_revenue: 1,
-            net_profit: 1,
-        }).populate('tsic').exec();
+        const skip = (page - 1) * limit;
 
-        return businesses.map(business => {
-            const revenue_last = business.total_revenue && business.total_revenue.length > 0
+        const [businesses, total] = await Promise.all([
+            this.businessModel.find(filter, {
+                businessid: 1,
+                name: 1,
+                type: 1,
+                tsic: 1,
+                reg_cap: 1,
+                total_revenue: 1,
+                net_profit: 1,
+            }).populate('tsic').skip(skip).limit(limit).exec(),
+            this.businessModel.countDocuments(filter).exec(),
+        ]);
+
+        const data = businesses.map(business => {
+            const revenue_last = business.total_revenue?.length
                 ? business.total_revenue[business.total_revenue.length - 1]
                 : 0;
-
-            const profit_last = business.net_profit && business.net_profit.length > 0
+            const profit_last = business.net_profit?.length
                 ? business.net_profit[business.net_profit.length - 1]
                 : 0;
-
             return {
                 businessid: business.businessid,
                 name: business.name,
@@ -74,35 +66,18 @@ export class BusinessService {
                 profit_last,
             };
         });
-    }
 
-    async findByTsic(tsicId: string): Promise<Business[]> {
-        if (!isValidObjectId(tsicId)) {
-            throw new BadRequestException('Invalid TSIC ID format');
-        }
-
-        try {
-            return await this.businessModel
-                .find({ tsic: tsicId })
-                .populate('tsic')
-                .populate('section')
-                .exec();
-        } catch (error) {
-            throw new BadRequestException(
-                `Failed to retrieve businesses by TSIC: ${error.message}`,
-            );
-        }
+        return { data, total, page, limit };
     }
 
     async findOne(id: string): Promise<Business> {
-        const businessId = Number(id);
-        if (!id || isNaN(businessId)) {
+        if (!isValidObjectId(id)) {
             throw new BadRequestException('Invalid business ID format');
         }
 
         try {
             const business = await this.businessModel
-                .findOne({ businessid: businessId })
+                .findById(id)
                 .populate('tsic')
                 .populate('section')
                 .exec();
@@ -115,7 +90,7 @@ export class BusinessService {
                 throw error;
             }
             throw new BadRequestException(
-                `Failed to retrieve business: ${error.message}`,
+                `Failed to retrieve business: ${(error as Error).message}`,
             );
         }
     }
@@ -145,7 +120,7 @@ export class BusinessService {
                 throw error;
             }
             throw new BadRequestException(
-                `Failed to update business: ${error.message}`,
+                `Failed to update business: ${(error as Error).message}`,
             );
         }
     }
@@ -172,7 +147,7 @@ export class BusinessService {
                 throw error;
             }
             throw new BadRequestException(
-                `Failed to delete business: ${error.message}`,
+                `Failed to delete business: ${(error as Error).message}`,
             );
         }
     }
